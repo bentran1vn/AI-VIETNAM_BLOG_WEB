@@ -1,6 +1,6 @@
-import { Resolver, Query, Args, ObjectType, Field } from '@nestjs/graphql';
-import { FilesService } from './files.service';
-import { FileNode as FileNodeType } from './types';
+import { Resolver, Query, Args, ObjectType, Field } from "@nestjs/graphql";
+import { FilesService } from "./files.service";
+import { FileNode as FileNodeType } from "./types";
 
 @ObjectType()
 class FileMetadata {
@@ -42,18 +42,18 @@ export class FilesResolver {
   }
 
   @Query(() => String)
-  async getFileContent(@Args('path') filePath: string) {
-    const parts = filePath.split('/');
-    const filename = parts.pop() || '';
-    const module = parts.join('/');
+  async getFileContent(@Args("path") filePath: string) {
+    const parts = filePath.split("/");
+    const filename = parts.pop() || "";
+    const module = parts.join("/");
     return this.filesService.getFileContent(module, filename);
   }
 
   @Query(() => FileMetadata)
-  async getFileMetadata(@Args('path') filePath: string) {
-    const parts = filePath.split('/');
-    const filename = parts.pop() || '';
-    const module = parts.join('/');
+  async getFileMetadata(@Args("path") filePath: string) {
+    const parts = filePath.split("/");
+    const filename = parts.pop() || "";
+    const module = parts.join("/");
     return this.filesService.getFileMetadata(module, filename);
   }
 }

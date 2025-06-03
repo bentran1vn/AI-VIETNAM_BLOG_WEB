@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { Octokit } from 'octokit';
-import { FileNode } from './types';
-import { FileStorage } from './file-storage.interface';
+import { Injectable } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { Octokit } from "octokit";
+import { FileNode } from "./types";
+import { FileStorage } from "./file-storage.interface";
 
 interface GitHubContent {
   type: string;
@@ -38,7 +38,7 @@ type OctokitConstructor = {
 
 function createOctokit(token: string | undefined): TypedOctokit {
   if (!token) {
-    throw new Error('GitHub token is required');
+    throw new Error("GitHub token is required");
   }
   const OctokitConstructor = Octokit as unknown as OctokitConstructor;
   return new OctokitConstructor({ auth: token });
@@ -52,14 +52,14 @@ export class GitHubService implements FileStorage {
   private branch: string;
 
   constructor(private configService: ConfigService) {
-    const token = this.configService.get<string>('GITHUB_TOKEN');
+    const token = this.configService.get<string>("GITHUB_TOKEN");
     this.octokit = createOctokit(token);
-    this.owner = this.configService.get<string>('GITHUB_OWNER') as string;
-    this.repo = this.configService.get<string>('GITHUB_REPO') as string;
-    this.branch = this.configService.get<string>('GITHUB_BRANCH') as string;
+    this.owner = this.configService.get<string>("GITHUB_OWNER") as string;
+    this.repo = this.configService.get<string>("GITHUB_REPO") as string;
+    this.branch = this.configService.get<string>("GITHUB_BRANCH") as string;
   }
 
-  async getDirectoryStructure(path: string = ''): Promise<FileNode[]> {
+  async getDirectoryStructure(path: string = ""): Promise<FileNode[]> {
     try {
       const response = await this.octokit.rest.repos.getContent({
         owner: this.owner,
@@ -71,21 +71,21 @@ export class GitHubService implements FileStorage {
       if (Array.isArray(response.data)) {
         const structure: FileNode[] = [];
         for (const item of response.data) {
-          if (item.type === 'dir') {
+          if (item.type === "dir") {
             const children = await this.getDirectoryStructure(item.path);
             structure.push({
               name: item.name,
-              type: 'directory',
+              type: "directory",
               path: item.path,
               children,
             });
           } else if (
-            item.type === 'file' &&
-            (item.name.endsWith('.md') || item.name.endsWith('.tex'))
+            item.type === "file" &&
+            (item.name.endsWith(".md") || item.name.endsWith(".tex"))
           ) {
             structure.push({
               name: item.name,
-              type: 'file',
+              type: "file",
               path: item.path,
             });
           }
@@ -94,8 +94,7 @@ export class GitHubService implements FileStorage {
       }
       return [];
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
       throw new Error(`Failed to fetch directory structure: ${errorMessage}`);
     }
   }
@@ -109,15 +108,12 @@ export class GitHubService implements FileStorage {
         ref: this.branch,
       });
 
-      if ('content' in response.data) {
-        return Buffer.from(response.data.content || '', 'base64').toString(
-          'utf-8',
-        );
+      if ("content" in response.data) {
+        return Buffer.from(response.data.content || "", "base64").toString("utf-8");
       }
-      throw new Error('File content not found');
+      throw new Error("File content not found");
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
       throw new Error(`Failed to fetch file content: ${errorMessage}`);
     }
   }
@@ -131,18 +127,17 @@ export class GitHubService implements FileStorage {
         ref: this.branch,
       });
 
-      if ('sha' in response.data) {
+      if ("sha" in response.data) {
         return {
           filename: response.data.name,
           size: response.data.size || 0,
-          lastModified: new Date(response.data.updated_at || ''),
-          created: new Date(response.data.created_at || ''),
+          lastModified: new Date(response.data.updated_at || ""),
+          created: new Date(response.data.created_at || ""),
         };
       }
-      throw new Error('File metadata not found');
+      throw new Error("File metadata not found");
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
       throw new Error(`Failed to fetch file metadata: ${errorMessage}`);
     }
   }
