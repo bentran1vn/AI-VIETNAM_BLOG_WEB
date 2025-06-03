@@ -10,6 +10,8 @@ node_modules/
 # Production
 /dist
 /build
+/backend/dist
+/backend/build
 
 # Logs
 logs
