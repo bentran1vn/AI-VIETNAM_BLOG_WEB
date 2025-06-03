@@ -1,0 +1,14 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Branch naming convention check
+BRANCH_NAME=$(git symbolic-ref --short HEAD)
+BRANCH_PATTERN="^(feature|bugfix|hotfix|release|dev)/[a-z0-9-]+$"
+
+if ! [[ $BRANCH_NAME =~ $BRANCH_PATTERN ]]; then
+  echo "Error: Branch name '$BRANCH_NAME' does not follow the naming convention."
+  echo "Branch names should be in the format: type/description"
+  echo "Types: feature, bugfix, hotfix, release, dev"
+  echo "Example: feature/user-authentication"
+  exit 1
+fi 
