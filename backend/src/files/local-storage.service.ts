@@ -30,10 +30,7 @@ export class LocalStorageService implements FileStorage {
             path: entryPath,
             children,
           });
-        } else if (
-          entry.isFile() &&
-          (entry.name.endsWith(".md") || entry.name.endsWith(".tex"))
-        ) {
+        } else if (entry.isFile() && (entry.name.endsWith(".md") || entry.name.endsWith(".tex"))) {
           structure.push({
             name: entry.name,
             type: "file",
@@ -44,8 +41,7 @@ export class LocalStorageService implements FileStorage {
 
       return structure;
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error";
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
       throw new Error(`Failed to read directory structure: ${errorMessage}`);
     }
   }
@@ -59,8 +55,7 @@ export class LocalStorageService implements FileStorage {
       const fullPath = path.join(this.storagePath, filePath);
       return await fs.readFile(fullPath, "utf-8");
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error";
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
       throw new Error(`Failed to read file content: ${errorMessage}`);
     }
   }
@@ -80,8 +75,7 @@ export class LocalStorageService implements FileStorage {
         created: stats.birthtime,
       };
     } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error";
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
       throw new Error(`Failed to get file metadata: ${errorMessage}`);
     }
   }

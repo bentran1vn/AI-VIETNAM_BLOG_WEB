@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Post } from './post.schema';
+import { Injectable } from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+import { Model } from "mongoose";
+import { Post } from "./post.schema";
 
 @Injectable()
 export class PostService {
@@ -15,10 +15,7 @@ export class PostService {
     return this.postModel.findById(id).exec();
   }
 
-  async create(createPostDto: {
-    title: string;
-    content: string;
-  }): Promise<Post> {
+  async create(createPostDto: { title: string; content: string }): Promise<Post> {
     const createdPost = new this.postModel(createPostDto);
     return createdPost.save();
   }
@@ -27,9 +24,7 @@ export class PostService {
     id: string,
     updatePostDto: { title?: string; content?: string },
   ): Promise<Post | null> {
-    return this.postModel
-      .findByIdAndUpdate(id, updatePostDto, { new: true })
-      .exec();
+    return this.postModel.findByIdAndUpdate(id, updatePostDto, { new: true }).exec();
   }
 
   async delete(id: string): Promise<Post | null> {
