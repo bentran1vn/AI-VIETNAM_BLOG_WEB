@@ -50,6 +50,7 @@ export class GitHubService implements FileStorage {
   private owner: string;
   private repo: string;
   private branch: string;
+  private basePath: string;
 
   constructor(private configService: ConfigService) {
     const token = this.configService.get<string>("GITHUB_TOKEN");
@@ -57,42 +58,58 @@ export class GitHubService implements FileStorage {
     this.owner = this.configService.get<string>("GITHUB_OWNER") as string;
     this.repo = this.configService.get<string>("GITHUB_REPO") as string;
     this.branch = this.configService.get<string>("GITHUB_BRANCH") as string;
+    this.basePath = this.configService.get<string>("GITHUB_STORAGE_PATH") as string;
   }
 
-  async getDirectoryStructure(path: string = ""): Promise<FileNode[]> {
+  private async getContent(path: string): Promise<GitHubContent[]> {
     try {
+      const fullPath = path ? `${this.basePath}/${path}` : this.basePath;
       const response = await this.octokit.rest.repos.getContent({
         owner: this.owner,
         repo: this.repo,
-        path,
+        path: fullPath,
         ref: this.branch,
       });
 
       if (Array.isArray(response.data)) {
-        const structure: FileNode[] = [];
-        for (const item of response.data) {
-          if (item.type === "dir") {
-            const children = await this.getDirectoryStructure(item.path);
-            structure.push({
-              name: item.name,
-              type: "directory",
-              path: item.path,
-              children,
-            });
-          } else if (
-            item.type === "file" &&
-            (item.name.endsWith(".md") || item.name.endsWith(".tex"))
-          ) {
-            structure.push({
-              name: item.name,
-              type: "file",
-              path: item.path,
-            });
-          }
-        }
-        return structure;
+        return response.data;
       }
-      return [];
+      throw new Error("Expected directory content");
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      throw new Error(`Failed to fetch content: ${errorMessage}`);
+    }
+  }
+
+  async getDirectoryStructure(path: string = ""): Promise<FileNode[]> {
+    try {
+      const contents = await this.getContent(path);
+      const structure: FileNode[] = [];
+
+      for (const item of contents) {
+        if (item.type === "dir") {
+          const children = await this.getDirectoryStructure(
+            item.path.replace(`${this.basePath}/`, ""),
+          );
+          structure.push({
+            name: item.name,
+            type: "directory",
+            path: item.path.replace(`${this.basePath}/`, ""),
+            children,
+          });
+        } else if (
+          item.type === "file" &&
+          (item.name.endsWith(".md") || item.name.endsWith(".tex"))
+        ) {
+          structure.push({
+            name: item.name,
+            type: "file",
+            path: item.path.replace(`${this.basePath}/`, ""),
+          });
+        }
+      }
+
+      return structure;
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "Unknown error";
       throw new Error(`Failed to fetch directory structure: ${errorMessage}`);
@@ -101,10 +118,11 @@ export class GitHubService implements FileStorage {
 
   async getFileContent(path: string): Promise<string> {
     try {
+      const fullPath = `${this.basePath}/${path}`;
       const response = await this.octokit.rest.repos.getContent({
         owner: this.owner,
         repo: this.repo,
-        path,
+        path: fullPath,
         ref: this.branch,
       });
 
@@ -120,10 +138,11 @@ export class GitHubService implements FileStorage {
 
   async getFileMetadata(path: string) {
     try {
+      const fullPath = `${this.basePath}/${path}`;
       const response = await this.octokit.rest.repos.getContent({
         owner: this.owner,
         repo: this.repo,
-        path,
+        path: fullPath,
         ref: this.branch,
       });
 

@@ -15,7 +15,7 @@ const config_1 = require("@nestjs/config");
 const octokit_1 = require("octokit");
 function createOctokit(token) {
     if (!token) {
-        throw new Error('GitHub token is required');
+        throw new Error("GitHub token is required");
     }
     const OctokitConstructor = octokit_1.Octokit;
     return new OctokitConstructor({ auth: token });
@@ -26,90 +26,105 @@ let GitHubService = class GitHubService {
     owner;
     repo;
     branch;
+    basePath;
     constructor(configService) {
         this.configService = configService;
-        const token = this.configService.get('GITHUB_TOKEN');
+        const token = this.configService.get("GITHUB_TOKEN");
         this.octokit = createOctokit(token);
-        this.owner = this.configService.get('GITHUB_OWNER');
-        this.repo = this.configService.get('GITHUB_REPO');
-        this.branch = this.configService.get('GITHUB_BRANCH');
+        this.owner = this.configService.get("GITHUB_OWNER");
+        this.repo = this.configService.get("GITHUB_REPO");
+        this.branch = this.configService.get("GITHUB_BRANCH");
+        this.basePath = this.configService.get("GITHUB_STORAGE_PATH");
     }
-    async getDirectoryStructure(path = '') {
+    async getContent(path) {
         try {
+            const fullPath = path ? `${this.basePath}/${path}` : this.basePath;
             const response = await this.octokit.rest.repos.getContent({
                 owner: this.owner,
                 repo: this.repo,
-                path,
+                path: fullPath,
                 ref: this.branch,
             });
             if (Array.isArray(response.data)) {
-                const structure = [];
-                for (const item of response.data) {
-                    if (item.type === 'dir') {
-                        const children = await this.getDirectoryStructure(item.path);
-                        structure.push({
-                            name: item.name,
-                            type: 'directory',
-                            path: item.path,
-                            children,
-                        });
-                    }
-                    else if (item.type === 'file' &&
-                        (item.name.endsWith('.md') || item.name.endsWith('.tex'))) {
-                        structure.push({
-                            name: item.name,
-                            type: 'file',
-                            path: item.path,
-                        });
-                    }
-                }
-                return structure;
+                return response.data;
             }
-            return [];
+            throw new Error("Expected directory content");
         }
         catch (error) {
-            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            const errorMessage = error instanceof Error ? error.message : "Unknown error";
+            throw new Error(`Failed to fetch content: ${errorMessage}`);
+        }
+    }
+    async getDirectoryStructure(path = "") {
+        try {
+            const contents = await this.getContent(path);
+            const structure = [];
+            for (const item of contents) {
+                if (item.type === "dir") {
+                    const children = await this.getDirectoryStructure(item.path.replace(`${this.basePath}/`, ""));
+                    structure.push({
+                        name: item.name,
+                        type: "directory",
+                        path: item.path.replace(`${this.basePath}/`, ""),
+                        children,
+                    });
+                }
+                else if (item.type === "file" &&
+                    (item.name.endsWith(".md") || item.name.endsWith(".tex"))) {
+                    structure.push({
+                        name: item.name,
+                        type: "file",
+                        path: item.path.replace(`${this.basePath}/`, ""),
+                    });
+                }
+            }
+            return structure;
+        }
+        catch (error) {
+            const errorMessage = error instanceof Error ? error.message : "Unknown error";
             throw new Error(`Failed to fetch directory structure: ${errorMessage}`);
         }
     }
     async getFileContent(path) {
         try {
+            const fullPath = `${this.basePath}/${path}`;
             const response = await this.octokit.rest.repos.getContent({
                 owner: this.owner,
                 repo: this.repo,
-                path,
+                path: fullPath,
                 ref: this.branch,
             });
-            if ('content' in response.data) {
-                return Buffer.from(response.data.content || '', 'base64').toString('utf-8');
+            if ("content" in response.data) {
+                return Buffer.from(response.data.content || "", "base64").toString("utf-8");
             }
-            throw new Error('File content not found');
+            throw new Error("File content not found");
         }
         catch (error) {
-            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            const errorMessage = error instanceof Error ? error.message : "Unknown error";
             throw new Error(`Failed to fetch file content: ${errorMessage}`);
         }
     }
     async getFileMetadata(path) {
         try {
+            const fullPath = `${this.basePath}/${path}`;
             const response = await this.octokit.rest.repos.getContent({
                 owner: this.owner,
                 repo: this.repo,
-                path,
+                path: fullPath,
                 ref: this.branch,
             });
-            if ('sha' in response.data) {
+            if ("sha" in response.data) {
                 return {
                     filename: response.data.name,
                     size: response.data.size || 0,
-                    lastModified: new Date(response.data.updated_at || ''),
-                    created: new Date(response.data.created_at || ''),
+                    lastModified: new Date(response.data.updated_at || ""),
+                    created: new Date(response.data.created_at || ""),
                 };
             }
-            throw new Error('File metadata not found');
+            throw new Error("File metadata not found");
         }
         catch (error) {
-            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            const errorMessage = error instanceof Error ? error.message : "Unknown error";
             throw new Error(`Failed to fetch file metadata: ${errorMessage}`);
         }
     }

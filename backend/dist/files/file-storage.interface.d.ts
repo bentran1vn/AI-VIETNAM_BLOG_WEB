@@ -1,4 +1,4 @@
-import { FileNode } from './types';
+import { FileNode } from "./types";
 export interface FileStorage {
     getDirectoryStructure(path?: string): Promise<FileNode[]>;
     getFileContent(path: string): Promise<string>;

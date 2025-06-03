@@ -1,7 +1,7 @@
-import { ConfigService } from '@nestjs/config';
-import { FileNode } from './types';
-import { GitHubService } from './github.service';
-import { LocalStorageService } from './local-storage.service';
+import { ConfigService } from "@nestjs/config";
+import { FileNode } from "./types";
+import { GitHubService } from "./github.service";
+import { LocalStorageService } from "./local-storage.service";
 export declare class FilesService {
     private configService;
     private githubService;

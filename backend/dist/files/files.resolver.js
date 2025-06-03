@@ -74,15 +74,15 @@ let FilesResolver = class FilesResolver {
         return this.filesService.getDirectoryStructure();
     }
     async getFileContent(filePath) {
-        const parts = filePath.split('/');
-        const filename = parts.pop() || '';
-        const module = parts.join('/');
+        const parts = filePath.split("/");
+        const filename = parts.pop() || "";
+        const module = parts.join("/");
         return this.filesService.getFileContent(module, filename);
     }
     async getFileMetadata(filePath) {
-        const parts = filePath.split('/');
-        const filename = parts.pop() || '';
-        const module = parts.join('/');
+        const parts = filePath.split("/");
+        const filename = parts.pop() || "";
+        const module = parts.join("/");
         return this.filesService.getFileMetadata(module, filename);
     }
 };
@@ -95,14 +95,14 @@ __decorate([
 ], FilesResolver.prototype, "getDirectoryStructure", null);
 __decorate([
     (0, graphql_1.Query)(() => String),
-    __param(0, (0, graphql_1.Args)('path')),
+    __param(0, (0, graphql_1.Args)("path")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], FilesResolver.prototype, "getFileContent", null);
 __decorate([
     (0, graphql_1.Query)(() => FileMetadata),
-    __param(0, (0, graphql_1.Args)('path')),
+    __param(0, (0, graphql_1.Args)("path")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)

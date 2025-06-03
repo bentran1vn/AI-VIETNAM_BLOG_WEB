@@ -25,20 +25,25 @@ exports.AppModule = AppModule = __decorate([
         imports: [
             config_1.ConfigModule.forRoot({
                 isGlobal: true,
+                envFilePath: ".env",
             }),
             mongoose_1.MongooseModule.forRootAsync({
                 imports: [config_1.ConfigModule],
                 useFactory: (configService) => ({
-                    uri: configService.get('MONGODB_URI'),
+                    uri: configService.get("MONGODB_URI"),
                 }),
                 inject: [config_1.ConfigService],
             }),
-            graphql_1.GraphQLModule.forRoot({
+            graphql_1.GraphQLModule.forRootAsync({
                 driver: apollo_1.ApolloDriver,
-                autoSchemaFile: (0, path_1.join)(process.cwd(), 'src/schema.gql'),
-                sortSchema: true,
-                playground: true,
-                introspection: true,
+                imports: [config_1.ConfigModule],
+                useFactory: (configService) => ({
+                    autoSchemaFile: (0, path_1.join)(process.cwd(), "src/schema.gql"),
+                    sortSchema: true,
+                    playground: configService.get("GRAPHQL_PLAYGROUND"),
+                    introspection: configService.get("GRAPHQL_INTROSPECTION"),
+                }),
+                inject: [config_1.ConfigService],
             }),
             post_module_1.PostModule,
             files_module_1.FilesModule,

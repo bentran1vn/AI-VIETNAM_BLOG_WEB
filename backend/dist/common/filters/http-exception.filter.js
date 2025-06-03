@@ -13,15 +13,17 @@ let GlobalExceptionFilter = class GlobalExceptionFilter {
         const ctx = host.switchToHttp();
         const response = ctx.getResponse();
         let status = common_1.HttpStatus.INTERNAL_SERVER_ERROR;
-        let message = 'Internal server error';
-        let error = 'Internal Server Error';
+        let message = "Internal server error";
+        let error = "Internal Server Error";
         if (exception instanceof common_1.HttpException) {
             status = exception.getStatus();
             const exceptionResponse = exception.getResponse();
-            message =
-                typeof exceptionResponse === 'string'
-                    ? exceptionResponse
-                    : exceptionResponse.message || exception.message;
+            const responseMessage = typeof exceptionResponse === "string"
+                ? exceptionResponse
+                : exceptionResponse.message;
+            message = Array.isArray(responseMessage)
+                ? responseMessage[0]
+                : responseMessage || exception.message;
             error = exception.name;
         }
         else if (exception instanceof Error) {

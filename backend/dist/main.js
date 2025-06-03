@@ -8,5 +8,8 @@ async function bootstrap() {
     app.useGlobalFilters(new http_exception_filter_1.GlobalExceptionFilter());
     await app.listen(process.env.PORT ?? 3000);
 }
-bootstrap();
+bootstrap().catch((error) => {
+    console.error("Application failed to start:", error);
+    process.exit(1);
+});
 //# sourceMappingURL=main.js.map

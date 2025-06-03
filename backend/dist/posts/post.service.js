@@ -33,9 +33,7 @@ let PostService = class PostService {
         return createdPost.save();
     }
     async update(id, updatePostDto) {
-        return this.postModel
-            .findByIdAndUpdate(id, updatePostDto, { new: true })
-            .exec();
+        return this.postModel.findByIdAndUpdate(id, updatePostDto, { new: true }).exec();
     }
     async delete(id) {
         return this.postModel.findByIdAndDelete(id).exec();

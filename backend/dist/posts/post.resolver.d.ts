@@ -1,5 +1,5 @@
-import { PostService } from './post.service';
-import { Post } from './post.schema';
+import { PostService } from "./post.service";
+import { Post } from "./post.schema";
 export declare class PostResolver {
     private readonly postService;
     constructor(postService: PostService);
