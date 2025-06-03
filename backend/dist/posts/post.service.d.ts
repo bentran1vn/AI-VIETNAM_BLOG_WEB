@@ -1,5 +1,5 @@
-import { Model } from 'mongoose';
-import { Post } from './post.schema';
+import { Model } from "mongoose";
+import { Post } from "./post.schema";
 export declare class PostService {
     private postModel;
     constructor(postModel: Model<Post>);

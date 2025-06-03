@@ -46,31 +46,31 @@ __decorate([
 ], PostResolver.prototype, "posts", null);
 __decorate([
     (0, graphql_1.Query)(() => post_schema_1.Post),
-    __param(0, (0, graphql_1.Args)('id', { type: () => graphql_1.ID })),
+    __param(0, (0, graphql_1.Args)("id", { type: () => graphql_1.ID })),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], PostResolver.prototype, "post", null);
 __decorate([
     (0, graphql_1.Mutation)(() => post_schema_1.Post),
-    __param(0, (0, graphql_1.Args)('title')),
-    __param(1, (0, graphql_1.Args)('content')),
+    __param(0, (0, graphql_1.Args)("title")),
+    __param(1, (0, graphql_1.Args)("content")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", Promise)
 ], PostResolver.prototype, "createPost", null);
 __decorate([
     (0, graphql_1.Mutation)(() => post_schema_1.Post),
-    __param(0, (0, graphql_1.Args)('id', { type: () => graphql_1.ID })),
-    __param(1, (0, graphql_1.Args)('title', { nullable: true })),
-    __param(2, (0, graphql_1.Args)('content', { nullable: true })),
+    __param(0, (0, graphql_1.Args)("id", { type: () => graphql_1.ID })),
+    __param(1, (0, graphql_1.Args)("title", { nullable: true })),
+    __param(2, (0, graphql_1.Args)("content", { nullable: true })),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, String, String]),
     __metadata("design:returntype", Promise)
 ], PostResolver.prototype, "updatePost", null);
 __decorate([
     (0, graphql_1.Mutation)(() => post_schema_1.Post),
-    __param(0, (0, graphql_1.Args)('id', { type: () => graphql_1.ID })),
+    __param(0, (0, graphql_1.Args)("id", { type: () => graphql_1.ID })),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)

@@ -7,7 +7,7 @@ class FileException extends common_1.HttpException {
         super({
             statusCode: common_1.HttpStatus.BAD_REQUEST,
             message,
-            error: 'File Error',
+            error: "File Error",
         }, common_1.HttpStatus.BAD_REQUEST);
     }
 }

@@ -25,11 +25,11 @@ let FilesService = class FilesService {
         this.githubService = githubService;
         this.localStorageService = localStorageService;
         this.storage =
-            this.configService.get('NODE_ENV') === 'production'
+            this.configService.get("NODE_ENV") === "production"
                 ? this.githubService
                 : this.localStorageService;
     }
-    async getDirectoryStructure(relativePath = '') {
+    async getDirectoryStructure(relativePath = "") {
         try {
             return await this.storage.getDirectoryStructure(relativePath);
         }

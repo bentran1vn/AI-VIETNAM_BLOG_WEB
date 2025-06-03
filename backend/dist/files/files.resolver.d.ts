@@ -1,5 +1,5 @@
-import { FilesService } from './files.service';
-import { FileNode as FileNodeType } from './types';
+import { FilesService } from "./files.service";
+import { FileNode as FileNodeType } from "./types";
 export declare class FilesResolver {
     private readonly filesService;
     constructor(filesService: FilesService);

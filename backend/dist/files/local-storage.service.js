@@ -37,8 +37,7 @@ let LocalStorageService = class LocalStorageService {
                         children,
                     });
                 }
-                else if (entry.isFile() &&
-                    (entry.name.endsWith(".md") || entry.name.endsWith(".tex"))) {
+                else if (entry.isFile() && (entry.name.endsWith(".md") || entry.name.endsWith(".tex"))) {
                     structure.push({
                         name: entry.name,
                         type: "file",
