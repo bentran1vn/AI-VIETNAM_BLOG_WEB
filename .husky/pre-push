@@ -11,4 +11,32 @@ if ! [[ $BRANCH_NAME =~ $BRANCH_PATTERN ]]; then
   echo "Types: feature, bugfix, hotfix, release, dev"
   echo "Example: feature/user-authentication"
   exit 1
-fi 
+fi
+
+echo "🔍 Running pre-push checks..."
+
+# Run tests
+echo "🧪 Running tests..."
+npm test
+if [ $? -ne 0 ]; then
+  echo "❌ Tests failed. Please fix the failing tests before pushing."
+  exit 1
+fi
+
+# Build frontend
+echo "🏗️ Building frontend..."
+cd frontend && npm run build
+if [ $? -ne 0 ]; then
+  echo "❌ Frontend build failed. Please fix the build errors before pushing."
+  exit 1
+fi
+
+# Build backend
+echo "🏗️ Building backend..."
+cd ../backend && npm run build
+if [ $? -ne 0 ]; then
+  echo "❌ Backend build failed. Please fix the build errors before pushing."
+  exit 1
+fi
+
+echo "✅ All checks passed! You can now push your changes." 

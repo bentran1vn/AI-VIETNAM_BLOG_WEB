@@ -4,7 +4,9 @@
   "description": "## Description A comprehensive Node.js project template with essential configurations and best practices. This project provides a solid foundation for building Node.js applications with proper environment management, testing setup, and development tooling.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "npm run test:backend && npm run test:frontend",
+    "test:backend": "cd backend && npm test",
+    "test:frontend": "cd frontend && npm test",
     "prepare": "husky install"
   },
   "repository": {
