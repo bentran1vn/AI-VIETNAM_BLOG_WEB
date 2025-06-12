@@ -30,7 +30,7 @@ export default function RegisterForm() {
       await createUser({
         variables: formData,
       });
-    } catch (err) {
+    } catch {
       // Error is handled in onError
     }
   };
