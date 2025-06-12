@@ -8,6 +8,13 @@ import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { PostModule } from "./posts/post.module";
 import { FilesModule } from "./files/files.module";
+import { UserModule } from "./users/user.module";
+import { Request, Response } from "express";
+
+interface GraphQLContext {
+  req: Request;
+  res: Response;
+}
 
 @Module({
   imports: [
@@ -30,11 +37,13 @@ import { FilesModule } from "./files/files.module";
         sortSchema: true,
         playground: configService.get<boolean>("GRAPHQL_PLAYGROUND"),
         introspection: configService.get<boolean>("GRAPHQL_INTROSPECTION"),
+        context: ({ req, res }: { req: Request; res: Response }): GraphQLContext => ({ req, res }),
       }),
       inject: [ConfigService],
     }),
     PostModule,
     FilesModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],
