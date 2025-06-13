@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { marked } from "marked";
-import LatexRenderer from "@/components/LatexRenderer";
 
 interface BlogPost {
   path: string;
@@ -10,7 +9,7 @@ interface BlogPost {
   author: string;
   content: string;
   category: string;
-  fileType: "md" | "tex";
+  fileType: "md" | "pdf";
 }
 
 type TreeNode = {
@@ -109,6 +108,7 @@ export default function BlogPage() {
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(true);
   const [collapsed, setCollapsed] = useState<{ [key: string]: boolean }>({});
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -120,6 +120,13 @@ export default function BlogPage() {
     };
     fetchPosts();
   }, []);
+
+  useEffect(() => {
+    setPdfUrl(null);
+    if (selectedPost && selectedPost.fileType === "pdf") {
+      setPdfUrl(`/localStorage/${selectedPost.path}`);
+    }
+  }, [selectedPost]);
 
   const tree = buildTree(posts);
 
@@ -180,8 +187,15 @@ export default function BlogPage() {
                     ),
                   }}
                 />
+              ) : pdfUrl ? (
+                <iframe
+                  src={pdfUrl}
+                  width="100%"
+                  height="800px"
+                  style={{ border: "1px solid #ccc" }}
+                />
               ) : (
-                <LatexRenderer content={selectedPost.content} />
+                <div>Loading PDF...</div>
               )}
             </div>
           </article>
