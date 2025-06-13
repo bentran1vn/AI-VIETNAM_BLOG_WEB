@@ -16,6 +16,7 @@
     "@tailwindcss/typography": "^0.5.16",
     "graphql": "^16.11.0",
     "katex": "^0.16.22",
+    "latex.js": "^0.12.6",
     "lucide-react": "^0.514.0",
     "marked": "^15.0.12",
     "next": "15.3.3",

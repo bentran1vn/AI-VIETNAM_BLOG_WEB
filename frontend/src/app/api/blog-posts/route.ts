@@ -11,7 +11,7 @@ interface BlogPost {
   author: string;
   content: string;
   category: string;
-  fileType: "md" | "tex";
+  fileType: "md" | "tex" | "pdf";
 }
 
 async function getFilesRecursively(
@@ -35,30 +35,33 @@ async function getFilesRecursively(
       await getFilesRecursively(owner, repo, item.path, item.name, posts);
     } else if (
       item.type === "file" &&
-      (item.name.endsWith(".tex") || item.name.endsWith(".md"))
+      (item.name.endsWith(".md") || item.name.endsWith(".pdf"))
     ) {
-      const { data: fileContent } = await octokit.repos.getContent({
-        owner,
-        repo,
-        path: item.path,
-      });
+      let content = "";
+      let title = item.name;
+      const author = "Unknown";
 
-      if (!("content" in fileContent)) continue;
+      if (item.name.endsWith(".md")) {
+        const { data: fileContent } = await octokit.repos.getContent({
+          owner,
+          repo,
+          path: item.path,
+        });
 
-      const content = Buffer.from(fileContent.content, "base64").toString();
+        if (!("content" in fileContent)) return;
 
-      // Try to extract metadata for both .md and .tex
-      const titleMatch =
-        content.match(/\\title\{([^}]+)\}/) || content.match(/^# (.+)$/m);
-      const authorMatch = content.match(/\\author\{([^}]+)\}/);
+        content = Buffer.from(fileContent.content, "base64").toString();
+        const titleMatch = content.match(/^# (.+)$/m);
+        title = titleMatch ? titleMatch[1] : item.name;
+      }
 
       posts.push({
         path: item.path,
-        title: titleMatch ? titleMatch[1] : item.name,
-        author: authorMatch ? authorMatch[1] : "Unknown",
-        content: content,
+        title,
+        author,
+        content,
         category,
-        fileType: item.name.endsWith(".md") ? "md" : "tex",
+        fileType: item.name.endsWith(".md") ? "md" : "pdf",
       });
     }
   }
