@@ -5,13 +5,16 @@ const octokit = new Octokit({
   auth: process.env.GITHUB_TOKEN,
 });
 
-interface BlogPost {
+interface BlogPostMetadata {
   path: string;
   title: string;
   author: string;
-  content: string;
   category: string;
-  fileType: "md" | "tex" | "pdf";
+  fileType: "md" | "pdf";
+}
+
+interface BlogPost extends BlogPostMetadata {
+  content: string;
 }
 
 async function getFilesRecursively(
@@ -19,7 +22,7 @@ async function getFilesRecursively(
   repo: string,
   path: string,
   category: string,
-  posts: BlogPost[]
+  posts: BlogPostMetadata[]
 ) {
   const { data: contents } = await octokit.repos.getContent({
     owner,
@@ -37,29 +40,13 @@ async function getFilesRecursively(
       item.type === "file" &&
       (item.name.endsWith(".md") || item.name.endsWith(".pdf"))
     ) {
-      let content = "";
-      let title = item.name;
+      const title = item.name;
       const author = "Unknown";
-
-      if (item.name.endsWith(".md")) {
-        const { data: fileContent } = await octokit.repos.getContent({
-          owner,
-          repo,
-          path: item.path,
-        });
-
-        if (!("content" in fileContent)) return;
-
-        content = Buffer.from(fileContent.content, "base64").toString();
-        const titleMatch = content.match(/^# (.+)$/m);
-        title = titleMatch ? titleMatch[1] : item.name;
-      }
 
       posts.push({
         path: item.path,
         title,
         author,
-        content,
         category,
         fileType: item.name.endsWith(".md") ? "md" : "pdf",
       });
@@ -72,7 +59,7 @@ export async function GET() {
     const owner = "bentran1vn";
     const repo = "AI-VIETNAM_BLOG_WEB";
     const path = "localStorage";
-    const posts: BlogPost[] = [];
+    const posts: BlogPostMetadata[] = [];
 
     await getFilesRecursively(owner, repo, path, "root", posts);
 
@@ -81,6 +68,51 @@ export async function GET() {
     console.error("Error fetching blog posts:", error);
     return NextResponse.json(
       { error: "Failed to fetch blog posts" },
+      { status: 500 }
+    );
+  }
+}
+
+// New endpoint to fetch content for a specific post
+export async function POST(
+  req: Request
+): Promise<NextResponse<BlogPost | { error: string }>> {
+  try {
+    const { path } = await req.json();
+
+    if (!path) {
+      return NextResponse.json({ error: "Path is required" }, { status: 400 });
+    }
+
+    const owner = "bentran1vn";
+    const repo = "AI-VIETNAM_BLOG_WEB";
+
+    const { data: fileContent } = await octokit.repos.getContent({
+      owner,
+      repo,
+      path,
+    });
+
+    if (!("content" in fileContent)) {
+      return NextResponse.json({ error: "File not found" }, { status: 404 });
+    }
+
+    const content = Buffer.from(fileContent.content, "base64").toString();
+    const titleMatch = content.match(/^# (.+)$/m);
+    const title = titleMatch ? titleMatch[1] : path.split("/").pop() || "";
+
+    return NextResponse.json({
+      path,
+      title,
+      author: "Unknown",
+      content,
+      category: path.split("/")[1] || "root",
+      fileType: path.endsWith(".md") ? "md" : "pdf",
+    });
+  } catch (error) {
+    console.error("Error fetching blog post content:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch blog post content" },
       { status: 500 }
     );
   }
